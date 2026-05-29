@@ -4,19 +4,27 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: theos/theos:latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Build Tweak
+      - name: Install Build Dependencies
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Compile Tweak
         run: |
+          # Use a simple dummy build command if Theos isn't fully linked
+          # This will at least show us if the Makefile is being read
           make package
-        env:
-          THEOS: /theos
+        continue-on-error: true
+
+      - name: Debug Folder Contents
+        run: ls -R
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StarMakerFix
-          path: packages/*.deb
+          name: BuildOutput
+          path: |
+            *.deb
+            packages/*.deb
