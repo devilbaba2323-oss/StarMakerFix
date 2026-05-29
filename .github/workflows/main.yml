@@ -7,12 +7,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Tools
-        run: sudo apt-get update && sudo apt-get install -y build-essential make
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential make git curl
 
       - name: Setup Theos
         run: |
           git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          # Manually download the toolchain if it's missing
+          mkdir -p $GITHUB_WORKSPACE/theos/toolchain/linux/iphone
+          curl -L https://github.com/theos/toolchain-linux/releases/latest/download/linux-iphone-clang.tar.xz | tar -xJ -C $GITHUB_WORKSPACE/theos/toolchain/linux/iphone --strip-components=1
+          
+          # Setup SDKs
           mkdir -p $GITHUB_WORKSPACE/theos/sdks
           curl -LO https://github.com/theos/sdks/archive/master.tar.gz
           tar -xzf master.tar.gz -C $GITHUB_WORKSPACE/theos/sdks --strip-components=1
