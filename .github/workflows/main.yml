@@ -1,38 +1,14 @@
-name: Build Tweak
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential make git curl
-
-      - name: Setup Theos
+- name: Setup Theos
         run: |
+          # Install Theos
           git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
-          # Download and install the Linux Toolchain
+          
+          # Install Toolchain (using a direct, stable link)
           mkdir -p $GITHUB_WORKSPACE/theos/toolchain/linux
-          curl -LO https://github.com/theos/toolchain/releases/latest/download/linux.tar.gz
-          tar -xzf linux.tar.gz -C $GITHUB_WORKSPACE/theos/toolchain/linux --strip-components=1
-          # Download SDKs
+          curl -L https://github.com/theos/toolchain/releases/download/v0.1/linux.tar.gz -o toolchain.tar.gz
+          tar -xzf toolchain.tar.gz -C $GITHUB_WORKSPACE/theos/toolchain/linux --strip-components=1
+          
+          # Install SDKs (using a direct, stable link)
           mkdir -p $GITHUB_WORKSPACE/theos/sdks
-          curl -LO https://github.com/theos/sdks/archive/master.tar.gz
-          tar -xzf master.tar.gz -C $GITHUB_WORKSPACE/theos/sdks --strip-components=1
-
-      - name: Build Tweak
-        run: |
-          export THEOS=$GITHUB_WORKSPACE/theos
-          export PATH=$THEOS/bin:$PATH
-          make package
-        env:
-          THEOS: ${{ github.workspace }}/theos
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: StarMakerFix
-          path: packages/*.deb
+          curl -L https://github.com/theos/sdks/archive/master.tar.gz -o sdks.tar.gz
+          tar -xzf sdks.tar.gz -C $GITHUB_WORKSPACE/theos/sdks --strip-components=1
