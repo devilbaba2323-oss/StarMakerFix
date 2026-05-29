@@ -8,5 +8,9 @@ jobs:
       - name: Build Tweak
         uses: Randomblock1/theos-action@v1
         with:
-          # This automatically handles the setup for you
           args: make package
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: StarMakerFix
+          path: packages/*.deb
