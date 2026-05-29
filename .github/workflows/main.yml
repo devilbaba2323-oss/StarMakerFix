@@ -1,25 +1,31 @@
 name: Build Tweak
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Theos and SDKs
-        uses: actions/checkout@v4
-        with:
-          repository: theos/theos
-          path: theos
-      - name: Download SDKs
+
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential curl git make
+
+      - name: Setup Theos
         run: |
+          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
           mkdir -p $GITHUB_WORKSPACE/theos/sdks
           curl -LO https://github.com/theos/sdks/archive/master.tar.gz
           tar -xzf master.tar.gz -C $GITHUB_WORKSPACE/theos/sdks --strip-components=1
+
       - name: Build Tweak
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
-          $THEOS/bin/make package
+          export PATH=$THEOS/bin:$PATH
+          make package
+        env:
+          THEOS: ${{ github.workspace }}/theos
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
