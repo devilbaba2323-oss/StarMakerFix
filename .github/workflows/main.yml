@@ -8,28 +8,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Theos
-        uses: actions/checkout@v4
-        with:
-          repository: theos/theos
-          path: theos
-          submodules: recursive
-
-      - name: Download SDKs
         run: |
-          mkdir -p theos/sdks
+          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          # Download the Toolchain (Fixes the "clang not found" error)
+          mkdir -p $GITHUB_WORKSPACE/theos/toolchain/linux/iphone
+          curl -L https://github.com/theos/toolchain-linux/releases/latest/download/linux-iphone-clang.tar.gz | tar -xz -C $GITHUB_WORKSPACE/theos/toolchain/linux/iphone --strip-components=1
+          
+          # Setup SDKs
+          mkdir -p $GITHUB_WORKSPACE/theos/sdks
           curl -LO https://github.com/theos/sdks/archive/master.tar.gz
-          tar -xzf master.tar.gz -C theos/sdks --strip-components=1
+          tar -xzf master.tar.gz -C $GITHUB_WORKSPACE/theos/sdks --strip-components=1
 
       - name: Build Tweak
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
-          export PATH=$THEOS/bin:$PATH
-          make package
-        env:
-          THEOS: ${{ github.workspace }}/theos
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: StarMakerFix
-          path: packages/*.deb
+          export PATH
+          
