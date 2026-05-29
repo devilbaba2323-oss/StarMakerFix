@@ -9,8 +9,12 @@ jobs:
         uses: Randomblock1/theos-action@v1
         with:
           args: make package
+      - name: List files to debug
+        run: ls -R
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StarMakerFix
-          path: packages/*.deb
+          path: |
+            packages/*.deb
+            *.deb
