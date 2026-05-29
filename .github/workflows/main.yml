@@ -1,0 +1,10 @@
+name: Build Tweak
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/work -w /work -e THEOS=/theos -e THEOS_MAKE_PATH=/theos/makefiles --entrypoint /bin/bash ghcr.io/theos/theos -c "make package"
