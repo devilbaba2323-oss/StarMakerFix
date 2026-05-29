@@ -6,11 +6,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Theos
+      - name: Setup Theos and SDKs
         uses: actions/checkout@v4
         with:
           repository: theos/theos
           path: theos
+      - name: Download SDKs
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/theos/sdks
+          curl -LO https://github.com/theos/sdks/archive/master.tar.gz
+          tar -xzf master.tar.gz -C $GITHUB_WORKSPACE/theos/sdks --strip-components=1
       - name: Build Tweak
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
